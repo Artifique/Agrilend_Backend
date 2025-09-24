@@ -1,0 +1,13 @@
+com/agrilend/backend/repository/UserRepository.class
+com/agrilend/backend/controller/AdminController.class
+com/agrilend/backend/entity/Farmer.class
+com/agrilend/backend/entity/enums/UserRole.class
+com/agrilend/backend/entity/Product.class
+com/agrilend/backend/repository/FarmerRepository.class
+com/agrilend/backend/entity/User.class
+com/agrilend/backend/entity/enums/OfferStatus.class
+com/agrilend/backend/entity/Buyer.class
+com/agrilend/backend/entity/enums/ProductUnit.class
+com/agrilend/backend/entity/enums/OrderStatus.class
+com/agrilend/backend/entity/Offer.class
+com/agrilend/backend/entity/User$UserType.class

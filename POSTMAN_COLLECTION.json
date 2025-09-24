@@ -1,0 +1,602 @@
+{
+  "info": {
+    "name": "Agrilend Backend API",
+    "description": "Collection complète pour tester l'API Agrilend de tokenisation agricole",
+    "version": "1.0.0"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{jwt_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "jwt_token",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "farmer_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "product_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "receipt_id",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "schedule_id",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "1. Authentification",
+      "item": [
+        {
+          "name": "Inscription Agriculteur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Jean\",\n  \"lastName\": \"Dupont\",\n  \"email\": \"jean.dupont@farmer.com\",\n  \"password\": \"SecurePass123!\",\n  \"phone\": \"+33123456789\",\n  \"userType\": \"FARMER\",\n  \"farmName\": \"Ferme Bio Dupont\",\n  \"farmLocation\": \"Normandie, France\",\n  \"farmSize\": \"50 hectares\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Inscription Acheteur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"firstName\": \"Marie\",\n  \"lastName\": \"Martin\",\n  \"email\": \"marie.martin@buyer.com\",\n  \"password\": \"SecurePass123!\",\n  \"phone\": \"+33987654321\",\n  \"userType\": \"BUYER\",\n  \"companyName\": \"Bio Distribution SA\",\n  \"activityType\": \"Distribution alimentaire\",\n  \"companyAddress\": \"Paris, France\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "register"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Connexion Agriculteur",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"jean.dupont@farmer.com\",\n  \"password\": \"SecurePass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.data.accessToken);",
+                  "    pm.collectionVariables.set('farmer_id', response.data.user.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Connexion Admin",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@agrilend.com\",\n  \"password\": \"AdminPass123!\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["api", "auth", "login"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('jwt_token', response.data.accessToken);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "2. Gestion des Produits",
+      "item": [
+        {
+          "name": "Lister les Produits",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    if (response.data && response.data.length > 0) {",
+                  "        pm.collectionVariables.set('product_id', response.data[0].id);",
+                  "    }",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Créer un Produit (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Blé Bio\",\n  \"description\": \"Blé biologique de haute qualité\",\n  \"category\": \"Céréales\",\n  \"subcategory\": \"Blé\",\n  \"unit\": \"KG\",\n  \"pricePerUnit\": 0.85\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/products",
+              "host": ["{{base_url}}"],
+              "path": ["api", "products"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "3. Processus de Tokenisation",
+      "item": [
+        {
+          "name": "Étape 0 - Créer Reçu d'Entrepôt",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"farmerId\": {{farmer_id}},\n  \"productId\": {{product_id}},\n  \"batchNumber\": \"BLE2024001\",\n  \"grossWeight\": 1050.5,\n  \"netWeight\": 1000.0,\n  \"weightUnit\": \"KG\",\n  \"storageLocation\": \"Entrepôt A - Zone 1\",\n  \"qualityGrade\": \"Premium\",\n  \"inspectionReport\": \"Produit conforme aux standards bio\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tokenization/warehouse-receipts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tokenization", "warehouse-receipts"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('receipt_id', response.data.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Étape 1 - Valider Reçu (Admin)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"warehouseReceiptId\": {{receipt_id}},\n  \"inspectionReport\": \"Inspection complète réalisée. Produit conforme aux standards de qualité. Poids vérifié, qualité excellente.\",\n  \"auditorNotes\": \"Validation approuvée par l'auditeur principal\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/tokenization/warehouse-receipts/{{receipt_id}}/validate",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tokenization", "warehouse-receipts", "{{receipt_id}}", "validate"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Étape 2 - Préparer Transaction Programmée",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/tokenization/warehouse-receipts/{{receipt_id}}/prepare-mint",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tokenization", "warehouse-receipts", "{{receipt_id}}", "prepare-mint"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.collectionVariables.set('schedule_id', response.data);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "response": []
+        },
+        {
+          "name": "Étape 3 - Signer Transaction Programmée",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/tokenization/scheduled-transactions/{{schedule_id}}/sign",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tokenization", "scheduled-transactions", "{{schedule_id}}", "sign"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les Tokens de Récolte",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/tokenization/tokens",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tokenization", "tokens"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les Reçus d'Entrepôt",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/tokenization/warehouse-receipts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tokenization", "warehouse-receipts"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "4. Gestion des Offres",
+      "item": [
+        {
+          "name": "Créer une Offre",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": {{product_id}},\n  \"quantity\": 500.0,\n  \"suggestedPrice\": 0.90,\n  \"harvestDate\": \"2024-09-15\",\n  \"availabilityDate\": \"2024-10-01\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/offers",
+              "host": ["{{base_url}}"],
+              "path": ["api", "offers"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les Offres Actives",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/offers?status=ACTIVE",
+              "host": ["{{base_url}}"],
+              "path": ["api", "offers"],
+              "query": [
+                {
+                  "key": "status",
+                  "value": "ACTIVE"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Valider une Offre (Admin)",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"ACTIVE\",\n  \"validatedByAdmin\": true,\n  \"finalPriceFarmer\": 0.85,\n  \"finalPriceBuyer\": 0.95\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/offers/{{offer_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "offers", "{{offer_id}}"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "5. Gestion des Commandes",
+      "item": [
+        {
+          "name": "Passer une Commande",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"offerId\": {{offer_id}},\n  \"quantity\": 250.0,\n  \"totalPrice\": 237.50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister mes Commandes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/orders",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Détails d'une Commande",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/orders/{{order_id}}",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "{{order_id}}"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Confirmer Livraison",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/orders/{{order_id}}/confirm-delivery",
+              "host": ["{{base_url}}"],
+              "path": ["api", "orders", "{{order_id}}", "confirm-delivery"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "6. Intégration Hedera",
+      "item": [
+        {
+          "name": "Créer Compte Hedera",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/api/hedera/accounts",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hedera", "accounts"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Solde Compte Hedera",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/hedera/accounts/{{hedera_account_id}}/balance",
+              "host": ["{{base_url}}"],
+              "path": ["api", "hedera", "accounts", "{{hedera_account_id}}", "balance"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Historique des Transactions",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/transactions",
+              "host": ["{{base_url}}"],
+              "path": ["api", "transactions"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "7. Administration",
+      "item": [
+        {
+          "name": "Statistiques Plateforme",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/admin/stats",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "stats"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Lister les Utilisateurs",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/admin/users",
+              "host": ["{{base_url}}"],
+              "path": ["api", "admin", "users"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Reçus en Attente de Validation",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api/tokenization/warehouse-receipts/pending-validation",
+              "host": ["{{base_url}}"],
+              "path": ["api", "tokenization", "warehouse-receipts", "pending-validation"]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "8. Tests de Santé",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/actuator/health",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "health"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "Application Info",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/actuator/info",
+              "host": ["{{base_url}}"],
+              "path": ["actuator", "info"]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "API Documentation",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/api-docs",
+              "host": ["{{base_url}}"],
+              "path": ["api-docs"]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ]
+}
+
