@@ -63,24 +63,42 @@ public class UserService {
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé avec l'ID: " + userId));
 
-        user.setFirstName(userProfileDto.getFirstName());
-        user.setLastName(userProfileDto.getLastName());
-        user.setPhone(userProfileDto.getPhone());
+        if (userProfileDto.getFirstName() != null) {
+            user.setFirstName(userProfileDto.getFirstName());
+        }
+        if (userProfileDto.getLastName() != null) {
+            user.setLastName(userProfileDto.getLastName());
+        }
+        if (userProfileDto.getPhone() != null) {
+            user.setPhone(userProfileDto.getPhone());
+        }
         userRepository.save(user);
 
         if (user.getRole() == UserRole.FARMER) {
             Farmer farmer = farmerRepository.findById(userId)
                     .orElseThrow(() -> new IllegalStateException("Profil Agriculteur non trouvé pour l'utilisateur: " + userId));
-            farmer.setFarmName(userProfileDto.getFarmName());
-            farmer.setFarmLocation(userProfileDto.getFarmLocation());
-            farmer.setFarmSize(userProfileDto.getFarmSize());
+            if (userProfileDto.getFarmName() != null) {
+                farmer.setFarmName(userProfileDto.getFarmName());
+            }
+            if (userProfileDto.getFarmLocation() != null) {
+                farmer.setFarmLocation(userProfileDto.getFarmLocation());
+            }
+            if (userProfileDto.getFarmSize() != null) {
+                farmer.setFarmSize(userProfileDto.getFarmSize());
+            }
             farmerRepository.save(farmer);
         } else if (user.getRole() == UserRole.BUYER) {
             Buyer buyer = buyerRepository.findById(userId)
                     .orElseThrow(() -> new IllegalStateException("Profil Acheteur non trouvé pour l'utilisateur: " + userId));
-            buyer.setCompanyName(userProfileDto.getCompanyName());
-            buyer.setCompanyAddress(userProfileDto.getCompanyAddress());
-            buyer.setActivityType(userProfileDto.getActivityType());
+            if (userProfileDto.getCompanyName() != null) {
+                buyer.setCompanyName(userProfileDto.getCompanyName());
+            }
+            if (userProfileDto.getCompanyAddress() != null) {
+                buyer.setCompanyAddress(userProfileDto.getCompanyAddress());
+            }
+            if (userProfileDto.getActivityType() != null) {
+                buyer.setActivityType(userProfileDto.getActivityType());
+            }
             buyerRepository.save(buyer);
         }
 
@@ -126,6 +144,22 @@ public class UserService {
     }
 
     private UserProfileDto mapUserToProfileDto(User user) {
-        return modelMapper.map(user, UserProfileDto.class);
+        UserProfileDto dto = modelMapper.map(user, UserProfileDto.class);
+
+        if (user.getRole() == UserRole.FARMER) {
+            farmerRepository.findById(user.getId()).ifPresent(farmer -> {
+                dto.setFarmName(farmer.getFarmName());
+                dto.setFarmLocation(farmer.getFarmLocation());
+                dto.setFarmSize(farmer.getFarmSize());
+            });
+        } else if (user.getRole() == UserRole.BUYER) {
+            buyerRepository.findById(user.getId()).ifPresent(buyer -> {
+                dto.setCompanyName(buyer.getCompanyName());
+                dto.setCompanyAddress(buyer.getCompanyAddress());
+                dto.setActivityType(buyer.getActivityType());
+            });
+        }
+
+        return dto;
     }
 }

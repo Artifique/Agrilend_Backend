@@ -118,4 +118,56 @@ public class AdminDashboardService {
         }
         return revenueByCategory;
     }
+
+    public Map<LocalDate, BigDecimal> getRevenueLast7Days() {
+        Map<LocalDate, BigDecimal> result = new HashMap<>();
+        LocalDate today = LocalDate.now();
+        for (int i = 6; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+            BigDecimal revenue = orderRepository.sumTotalAmountByCreatedAtBetween(startOfDay, endOfDay);
+            result.put(date, revenue != null ? revenue : BigDecimal.ZERO);
+        }
+        return result;
+    }
+
+    public Map<LocalDate, BigDecimal> getRevenueLast30Days() {
+        Map<LocalDate, BigDecimal> result = new HashMap<>();
+        LocalDate today = LocalDate.now();
+        for (int i = 29; i >= 0; i--) {
+            LocalDate date = today.minusDays(i);
+            LocalDateTime startOfDay = date.atStartOfDay();
+            LocalDateTime endOfDay = date.atTime(LocalTime.MAX);
+            BigDecimal revenue = orderRepository.sumTotalAmountByCreatedAtBetween(startOfDay, endOfDay);
+            result.put(date, revenue != null ? revenue : BigDecimal.ZERO);
+        }
+        return result;
+    }
+
+    public Map<String, BigDecimal> getRevenueLast3Months() {
+        Map<String, BigDecimal> result = new HashMap<>();
+        LocalDate today = LocalDate.now();
+        for (int i = 2; i >= 0; i--) {
+            LocalDate monthStart = today.minusMonths(i).withDayOfMonth(1);
+            LocalDateTime startOfMonth = monthStart.atStartOfDay();
+            LocalDateTime endOfMonth = monthStart.plusMonths(1).atStartOfDay().minusNanos(1);
+            BigDecimal revenue = orderRepository.sumTotalAmountByCreatedAtBetween(startOfMonth, endOfMonth);
+            result.put(monthStart.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM")), revenue != null ? revenue : BigDecimal.ZERO);
+        }
+        return result;
+    }
+
+    public Map<String, BigDecimal> getRevenueLastYear() {
+        Map<String, BigDecimal> result = new HashMap<>();
+        LocalDate today = LocalDate.now();
+        for (int i = 11; i >= 0; i--) {
+            LocalDate monthStart = today.minusMonths(i).withDayOfMonth(1);
+            LocalDateTime startOfMonth = monthStart.atStartOfDay();
+            LocalDateTime endOfMonth = monthStart.plusMonths(1).atStartOfDay().minusNanos(1);
+            BigDecimal revenue = orderRepository.sumTotalAmountByCreatedAtBetween(startOfMonth, endOfMonth);
+            result.put(monthStart.format(java.time.format.DateTimeFormatter.ofPattern("yyyy-MM")), revenue != null ? revenue : BigDecimal.ZERO);
+        }
+        return result;
+    }
 }

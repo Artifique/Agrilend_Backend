@@ -67,6 +67,7 @@ public class AdminController {
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "createdAt") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir) {
+        System.out.println("DEBUG: getAllUsers endpoint hit!");
         Sort sort = sortDir.equalsIgnoreCase("desc") ?
             Sort.by(sortBy).descending() : Sort.by(sortBy).ascending();
         Pageable pageable = PageRequest.of(page, size, sort);
@@ -108,6 +109,16 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Utilisateur désactivé avec succès"));
     }
 
+    @PutMapping("/users/{userId}/profile")
+    @Operation(summary = "Mettre à jour le profil d'un utilisateur (Admin)", description = "Met à jour le profil de n'importe quel utilisateur via son ID")
+    public ResponseEntity<ApiResponse<UserProfileDto>> updateUserProfile(
+            @PathVariable Long userId,
+            @Valid @RequestBody UserProfileDto userProfileDto) {
+        System.out.println("DEBUG: updateUserProfile endpoint hit for userId: " + userId);
+        UserProfileDto updatedProfile = userService.updateUserProfile(userId, userProfileDto);
+        return ResponseEntity.ok(ApiResponse.success("Profil utilisateur mis à jour avec succès", updatedProfile));
+    }
+
     // Gestion des produits
     @PostMapping("/products")
     @Operation(summary = "Créer un nouveau produit", description = "Crée un nouveau produit dans le catalogue")
@@ -130,6 +141,13 @@ public class AdminController {
     public ResponseEntity<ApiResponse<String>> deactivateProduct(@PathVariable Long productId) {
         productService.deactivateProduct(productId);
         return ResponseEntity.ok(ApiResponse.success("Produit désactivé avec succès"));
+    }
+
+    @PostMapping("/products/{productId}/activate")
+    @Operation(summary = "Activer un produit", description = "Active un produit du catalogue")
+    public ResponseEntity<ApiResponse<String>> activateProduct(@PathVariable Long productId) {
+        productService.activateProduct(productId);
+        return ResponseEntity.ok(ApiResponse.success("Produit activé avec succès"));
     }
 
     @GetMapping("/products/{productId}")
@@ -323,11 +341,12 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success("Revenu quotidien récupéré avec succès", revenue));
     }
 
-    @GetMapping("/dashboardseptember")
+    @GetMapping("/dashboard/revenue/monthly")
     @Operation(summary = "Revenu mensuel", description = "Récupère le revenu pour un mois spécifique")
     public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> getMonthlyRevenue(
             @RequestParam("year") int year,
             @RequestParam("month") int month) {
+        System.out.println("DEBUG: getMonthlyRevenue endpoint hit for year: " + year + ", month: " + month);
         Map<String, BigDecimal> revenue = adminDashboardService.getMonthlyRevenue(year, month);
         return ResponseEntity.ok(ApiResponse.success("Revenu mensuel récupéré avec succès", revenue));
     }
@@ -345,6 +364,34 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> getRevenueByCategory() {
         Map<String, BigDecimal> revenueByCategory = adminDashboardService.getRevenueByCategory();
         return ResponseEntity.ok(ApiResponse.success("Revenu par catégorie récupéré avec succès", revenueByCategory));
+    }
+
+    @GetMapping("/dashboard/revenue/last7days")
+    @Operation(summary = "Revenu des 7 derniers jours", description = "Récupère le revenu pour les 7 derniers jours")
+    public ResponseEntity<ApiResponse<Map<LocalDate, BigDecimal>>> getRevenueLast7Days() {
+        Map<LocalDate, BigDecimal> revenue = adminDashboardService.getRevenueLast7Days();
+        return ResponseEntity.ok(ApiResponse.success("Revenu des 7 derniers jours récupéré avec succès", revenue));
+    }
+
+    @GetMapping("/dashboard/revenue/last30days")
+    @Operation(summary = "Revenu des 30 derniers jours", description = "Récupère le revenu pour les 30 derniers jours")
+    public ResponseEntity<ApiResponse<Map<LocalDate, BigDecimal>>> getRevenueLast30Days() {
+        Map<LocalDate, BigDecimal> revenue = adminDashboardService.getRevenueLast30Days();
+        return ResponseEntity.ok(ApiResponse.success("Revenu des 30 derniers jours récupéré avec succès", revenue));
+    }
+
+    @GetMapping("/dashboard/revenue/last3months")
+    @Operation(summary = "Revenu des 3 derniers mois", description = "Récupère le revenu pour les 3 derniers mois")
+    public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> getRevenueLast3Months() {
+        Map<String, BigDecimal> revenue = adminDashboardService.getRevenueLast3Months();
+        return ResponseEntity.ok(ApiResponse.success("Revenu des 3 derniers mois récupéré avec succès", revenue));
+    }
+
+    @GetMapping("/dashboard/revenue/lastyear")
+    @Operation(summary = "Revenu de la dernière année", description = "Récupère le revenu pour la dernière année (12 derniers mois)")
+    public ResponseEntity<ApiResponse<Map<String, BigDecimal>>> getRevenueLastYear() {
+        Map<String, BigDecimal> revenue = adminDashboardService.getRevenueLastYear();
+        return ResponseEntity.ok(ApiResponse.success("Revenu de la dernière année récupéré avec succès", revenue));
     }
 
 

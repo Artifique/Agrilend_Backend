@@ -36,7 +36,9 @@ public class OfferDto {
     // Informations du produit
     private String productName;
     private String productDescription;
+    private String productCategory;
     private String productUnit;
+    private String productImageUrl;
     private String productionMethod;
     
     // Informations de l'agriculteur
@@ -129,12 +131,28 @@ public class OfferDto {
         this.productDescription = productDescription;
     }
 
+    public String getProductCategory() {
+        return productCategory;
+    }
+
+    public void setProductCategory(String productCategory) {
+        this.productCategory = productCategory;
+    }
+
     public String getProductUnit() {
         return productUnit;
     }
 
     public void setProductUnit(String productUnit) {
         this.productUnit = productUnit;
+    }
+
+    public String getProductImageUrl() {
+        return productImageUrl;
+    }
+
+    public void setProductImageUrl(String productImageUrl) {
+        this.productImageUrl = productImageUrl;
     }
 
     public String getProductionMethod() {

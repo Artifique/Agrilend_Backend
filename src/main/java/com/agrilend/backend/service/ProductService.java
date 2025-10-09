@@ -52,6 +52,13 @@ public class ProductService {
         productRepository.save(product);
     }
 
+    public void activateProduct(Long productId) {
+        Product product = productRepository.findById(productId)
+            .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + productId));
+        product.setIsActive(true);
+        productRepository.save(product);
+    }
+
     public ProductDto getProductById(Long productId) {
         Product product = productRepository.findById(productId)
             .orElseThrow(() -> new RuntimeException("Produit non trouvé avec l'ID: " + productId));

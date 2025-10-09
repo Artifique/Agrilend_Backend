@@ -170,7 +170,9 @@ public class OfferService {
         dto.setProductId(product.getId());
         dto.setProductName(product.getName());
         dto.setProductDescription(product.getDescription());
+        dto.setProductCategory(product.getCategory());
         dto.setProductUnit(product.getUnit().name());
+        dto.setProductImageUrl(product.getImageUrl());
         if (offer.getProductionMethod() != null) {
             dto.setProductionMethod(offer.getProductionMethod().name());
         }
