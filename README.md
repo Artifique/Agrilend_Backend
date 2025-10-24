@@ -12,7 +12,7 @@ L'architecture suit le diagramme de composants fourni dans les spécifications :
 
 - **Frontend** : Applications React.js (Back Office), Flutter (Mobile), et Site Vitrine
 - **Backend** : API Gateway Spring Boot avec services métier
-- **Blockchain** : Intégration Hedera Hashgraph (HTS, HSCS, HCS)
+- **DLT** : Intégration Hedera Hashgraph (HTS, HSCS, HCS)
 - **Base de données** : MySQL pour la persistance des données
 
 ### Services Backend
@@ -35,7 +35,7 @@ L'architecture suit le diagramme de composants fourni dans les spécifications :
 ### Pour les Acheteurs
 - Recherche et consultation des produits disponibles
 - Passage de commandes avec paiement sécurisé
-- Système de séquestre automatique (3 mois)
+- Système de séquestre 
 - Confirmation de livraison et libération des fonds
 
 ### Pour les Administrateurs
@@ -44,55 +44,15 @@ L'architecture suit le diagramme de composants fourni dans les spécifications :
 - Supervision des transactions Hedera
 - Administration générale de la plateforme
 
-## Processus de Tokenisation
 
-Le processus suit exactement les spécifications des diagrammes de séquence :
-
-### Étape 0 : Livraison à l'entrepôt
-L'agriculteur livre sa récolte et reçoit un reçu d'entrepôt avec :
-- Numéro de lot unique
-- Poids brut et net
-- Localisation de stockage
-- Grade de qualité
-- Hash cryptographique pour l'audit
-
-### Étape 1 : Validation
-Un responsable qualité/auditeur valide le reçu après inspection :
-- Vérification de la qualité
-- Rapport d'inspection
-- Signature numérique de l'auditeur
-
-### Étape 2 : Transaction programmée
-Création d'une transaction programmée sur Hedera pour le minting :
-- Calcul automatique : 1 token = 1 kg de produit
-- Création du token HTS si nécessaire
-- Programmation de la transaction de minting
-
-### Étape 3 : Signature et exécution
-L'administrateur/auditeur signe la transaction programmée :
-- Signature de la transaction Hedera
-- Exécution automatique du minting
-- Enregistrement sur HCS (Consensus Service)
-
-### Étape 4 : Distribution
-Distribution des tokens aux parties prenantes :
-- Transfert vers les comptes des agriculteurs
-- Allocation pour les investisseurs
-- Mise à jour des balances
-
-### Étape 5 : Rachat
-Les acheteurs peuvent racheter les tokens contre les produits physiques :
-- Transfert des tokens vers la trésorerie
-- Planification de la livraison
-- Libération des produits physiques
 
 ## Technologies Utilisées
 
 - **Framework** : Spring Boot 3.2.0
 - **Base de données** : MySQL 8.0 / H2 (tests)
-- **Blockchain** : Hedera Hashgraph SDK 2.30.0
+- **DLT** : Hedera Hashgraph SDK 2.30.0
 - **Sécurité** : Spring Security + JWT
-- **Documentation** : OpenAPI 3 / Swagger
+- **Documentation** :  Swagger
 - **Build** : Maven
 - **Java** : OpenJDK 17
 
@@ -137,12 +97,6 @@ Accédez à la documentation interactive : `http://localhost:8080/swagger-ui.htm
 - `POST /api/auth/login` - Connexion
 - `POST /api/auth/refresh` - Renouvellement du token
 
-#### Tokenisation
-- `POST /api/tokenization/warehouse-receipts` - Créer un reçu d'entrepôt
-- `POST /api/tokenization/warehouse-receipts/{id}/validate` - Valider un reçu
-- `POST /api/tokenization/warehouse-receipts/{id}/prepare-mint` - Préparer le minting
-- `POST /api/tokenization/scheduled-transactions/{id}/sign` - Signer la transaction
-- `GET /api/tokenization/tokens` - Lister les tokens
 
 #### Offres et Commandes
 - `GET /api/offers` - Lister les offres
@@ -192,17 +146,12 @@ Le projet inclut une collection Postman complète avec :
 - `ADMIN` : Administration complète
 - `AUDITOR` : Validation et audit
 
-### Sécurité Blockchain
+### Sécurité DLT
 - Clés privées chiffrées
 - Transactions signées
-- Audit trail complet sur HCS
 
 ## Monitoring et Logs
 
-### Actuator Endpoints
-- `/actuator/health` - État de santé
-- `/actuator/metrics` - Métriques
-- `/actuator/info` - Informations système
 
 ### Logs Structurés
 - Logs détaillés des transactions Hedera
@@ -228,40 +177,19 @@ HEDERA_OPERATOR_ACCOUNT_ID=0.0.production_account
 
 ## Support et Maintenance
 
-### Logs et Debugging
-Les logs sont configurés pour capturer :
-- Toutes les transactions Hedera
-- Erreurs de validation
-- Tentatives d'authentification
-- Opérations critiques
 
-### Backup et Récupération
-- Sauvegarde automatique de la base de données
-- Export des clés Hedera sécurisé
-- Procédures de récupération documentées
-
-## Contribution
 
 ### Standards de Code
 - Respect des conventions Spring Boot
 - Tests unitaires obligatoires
-- Documentation JavaDoc complète
-- Validation des PR par l'équipe
 
 ### Roadmap
 - [ ] Interface mobile Flutter
-- [ ] Intégration IoT pour le suivi des récoltes
 - [ ] Marketplace décentralisée
-- [ ] Analytics avancées
 
-## Licence
-
-Ce projet est sous licence propriétaire Agrilend. Tous droits réservés.
 
 ## Contact
 
 Pour toute question technique ou commerciale :
 - Email : dev@agrilend.com
-- Documentation : https://docs.agrilend.com
-- Support : https://support.agrilend.com
 
